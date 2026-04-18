@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双人健身进度看板</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/locale/zh-cn.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1><i class="fas fa-heartbeat"></i> 双人健身进度看板</h1>
+            <div class="header-controls">
+                <button id="syncBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> 同步数据
+                </button>
+                <button id="exportBtn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> 导出数据
+                </button>
+                <button id="settingsBtn" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i> 设置
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区 - 左右分区 -->
+        <div class="main-content">
+            <!-- 左侧：用户 -->
+            <div class="user-panel" id="user-panel-1">
+                <div class="user-header">
+                    <h2><i class="fas fa-user"></i> 用户</h2>
+                    <div class="user-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">当前体重</div>
+                            <div class="stat-value" id="current-weight-1">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">目标体重</div>
+                            <div class="stat-value" id="target-weight-1">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">已减重</div>
+                            <div class="stat-value" id="weight-loss-1">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">连续打卡</div>
+                            <div class="stat-value" id="streak-days-1">-- 天</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 今日输入 -->
+                <div class="today-input">
+                    <h3><i class="fas fa-edit"></i> 今日体重记录</h3>
+                    <div class="input-group">
+                        <input type="number" step="0.1" id="today-weight-1" placeholder="输入今日体重 (kg)">
+                        <button id="submit-today-1" class="btn btn-primary">
+                            <i class="fas fa-check"></i> 提交
+                        </button>
+                        <button id="quick-fill-1" class="btn btn-secondary">
+                            <i class="fas fa-bolt"></i> 快速填充昨日
+                        </button>
+                    </div>
+                    <div class="today-change" id="today-change-1">
+                        与昨日相比：--
+                    </div>
+                </div>
+
+                <!-- 日历 -->
+                <div class="calendar-section">
+                    <h3><i class="fas fa-calendar-alt"></i> 体重日历</h3>
+                    <div class="calendar-controls">
+                        <button id="prev-month-1" class="btn btn-small"><i class="fas fa-chevron-left"></i></button>
+                        <h4 id="current-month-1">2024年4月</h4>
+                        <button id="next-month-1" class="btn btn-small"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar" id="calendar-1">
+                        <!-- 日历通过JS动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 图表 -->
+                <div class="chart-section">
+                    <h3><i class="fas fa-chart-line"></i> 体重变化趋势</h3>
+                    <div class="chart-container">
+                        <canvas id="chart-1"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：女朋友 -->
+            <div class="user-panel" id="user-panel-2">
+                <div class="user-header">
+                    <h2><i class="fas fa-user-female"></i> 女朋友</h2>
+                    <div class="user-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">当前体重</div>
+                            <div class="stat-value" id="current-weight-2">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">目标体重</div>
+                            <div class="stat-value" id="target-weight-2">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">已减重</div>
+                            <div class="stat-value" id="weight-loss-2">-- kg</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">连续打卡</div>
+                            <div class="stat-value" id="streak-days-2">-- 天</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 今日输入 -->
+                <div class="today-input">
+                    <h3><i class="fas fa-edit"></i> 今日体重记录</h3>
+                    <div class="input-group">
+                        <input type="number" step="0.1" id="today-weight-2" placeholder="输入今日体重 (kg)">
+                        <button id="submit-today-2" class="btn btn-primary">
+                            <i class="fas fa-check"></i> 提交
+                        </button>
+                        <button id="quick-fill-2" class="btn btn-secondary">
+                            <i class="fas fa-bolt"></i> 快速填充昨日
+                        </button>
+                    </div>
+                    <div class="today-change" id="today-change-2">
+                        与昨日相比：--
+                    </div>
+                </div>
+
+                <!-- 日历 -->
+                <div class="calendar-section">
+                    <h3><i class="fas fa-calendar-alt"></i> 体重日历</h3>
+                    <div class="calendar-controls">
+                        <button id="prev-month-2" class="btn btn-small"><i class="fas fa-chevron-left"></i></button>
+                        <h4 id="current-month-2">2024年4月</h4>
+                        <button id="next-month-2" class="btn btn-small"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar" id="calendar-2">
+                        <!-- 日历通过JS动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 图表 -->
+                <div class="chart-section">
+                    <h3><i class="fas fa-chart-line"></i> 体重变化趋势</h3>
+                    <div class="chart-container">
+                        <canvas id="chart-2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部状态栏 -->
+        <footer class="footer">
+            <div class="sync-status" id="sync-status">
+                <i class="fas fa-cloud"></i> 数据已同步至 GitHub Gist
+            </div>
+            <div class="last-update" id="last-update">
+                最后更新：--
+            </div>
+        </footer>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-cog"></i> 设置</h2>
+            
+            <div class="setting-section">
+                <h3>GitHub 配置</h3>
+                <div class="form-group">
+                    <label for="githubToken">GitHub Token</label>
+                    <input type="password" id="githubToken" placeholder="输入 GitHub Token">
+                    <small>只用于同步数据到你的 GitHub Gist</small>
+                </div>
+                <div class="form-group">
+                    <label for="encryptionPassword">加密密码</label>
+                    <input type="password" id="encryptionPassword" placeholder="设置数据加密密码">
+                    <small>用于加密体重数据，保护隐私</small>
+                </div>
+                <button id="saveSettings" class="btn btn-primary">保存设置</button>
+            </div>
+
+            <div class="setting-section">
+                <h3>用户信息</h3>
+                <div class="form-group">
+                    <label for="userName1">用户1名称</label>
+                    <input type="text" id="userName1" value="用户" placeholder="你的名称">
+                </div>
+                <div class="form-group">
+                    <label for="targetWeight1">用户1目标体重 (kg)</label>
+                    <input type="number" step="0.1" id="targetWeight1" placeholder="目标体重">
+                </div>
+                <div class="form-group">
+                    <label for="userName2">用户2名称</label>
+                    <input type="text" id="userName2" value="女朋友" placeholder="女朋友名称">
+                </div>
+                <div class="form-group">
+                    <label for="targetWeight2">用户2目标体重 (kg)</label>
+                    <input type="number" step="0.1" id="targetWeight2" placeholder="目标体重">
+                </div>
+            </div>
+
+            <div class="setting-section">
+                <h3>数据管理</h3>
+                <button id="exportData" class="btn btn-secondary">导出数据 (JSON)</button>
+                <button id="importData" class="btn btn-secondary">导入数据</button>
+                <button id="clearData" class="btn btn-danger">清空本地数据</button>
+            </div>
+
+            <button id="closeSettings" class="btn btn-primary">关闭</button>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="github.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
